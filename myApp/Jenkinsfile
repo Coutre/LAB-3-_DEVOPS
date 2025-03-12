@@ -3,12 +3,14 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/Coutre/COMP367-Lab-2.git'
+                git branch: 'main', url: 'https://github.com/Coutre/LAB-3-_DEVOPS'
             }
         }
         stage('Build') {
             steps {
-                sh 'mvn clean package'
+                dir('myApp') {
+                    sh 'mvn clean package'
+                }
             }
         }
     }
