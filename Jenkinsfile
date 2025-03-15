@@ -15,7 +15,9 @@ pipeline {
 
         stage('Build Maven Project') {
             steps {
-                sh 'mvn clean package'
+                dir('myApp') { 
+                    sh 'mvn clean package'
+                }
             }
         }
 
@@ -29,13 +31,17 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                sh "docker build -t $DOCKER_IMAGE ."
+                dir('myApp') { 
+                    sh "docker build -t $DOCKER_IMAGE ."
+                }
             }
         }
 
         stage('Push Docker Image') {
             steps {
-                sh "docker push $DOCKER_IMAGE"
+                dir('myApp') { 
+                    sh "docker push $DOCKER_IMAGE"
+                }
             }
         }
     }
