@@ -15,7 +15,9 @@ pipeline {
 
         stage('Build Maven Project') {
             steps {
-                bat 'mvn clean package'  // Use bat for Windows
+                dir('myApp'){
+                    bat 'mvn clean package' 
+                }            
             }
         }
 
@@ -36,13 +38,18 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                bat "docker build -t %DOCKER_IMAGE% ."
+                dir('myApp'){
+                    bat "docker build -t %DOCKER_IMAGE% ."
+                }
+
             }
         }
 
         stage('Push Docker Image') {
             steps {
-                bat "docker push %DOCKER_IMAGE%"
+                dir('myApp'){
+                    bat "docker push %DOCKER_IMAGE%"   
+                }
             }
         }
     }
