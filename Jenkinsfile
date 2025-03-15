@@ -16,7 +16,9 @@ pipeline {
         stage('Build Maven Project') {
             steps {
                 dir('myApp') { 
-                    sh 'mvn clean package'
+                    script {
+                        sh 'mvn clean package'           
+                    }
                 }
             }
         }
