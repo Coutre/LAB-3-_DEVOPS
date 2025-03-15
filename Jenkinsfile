@@ -9,7 +9,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git 'https://github.com/Coutre/LAB-3-_DEVOPS'
+                 git branch: 'main', git 'https://github.com/Coutre/LAB-3-_DEVOPS'
             }
         }
 
