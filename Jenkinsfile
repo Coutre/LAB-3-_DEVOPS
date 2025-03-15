@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_HUB_CREDENTIALS = 'docker-hub-credentials' 
+        DOCKER_HUB_CREDENTIALS = 'docker-hub-credentials'
         DOCKER_IMAGE = 'coutre/myapp:v1'
     }
 
@@ -15,36 +15,31 @@ pipeline {
 
         stage('Build Maven Project') {
             steps {
-                script{
+                script {
                     dir('myApp') { 
-
-                        sh 'mvn clean package'           
+                        sh 'mvn clean package'
                     }
                 }
-                
             }
         }
 
         stage('Docker Login') {
             steps {
-                withCredentials([usernamePassword(credentialsId: DOCKER_HUB_CREDENTIALS, usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-                    sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
+                script {
+                    withDockerRegistry([credentialsId: DOCKER_HUB_CREDENTIALS]) {
+                        echo "Logged into Docker Hub successfully."
+                    }
                 }
             }
         }
 
-        stage('Build Docker Image') {
+        stage('Build & Push Docker Image') {
             steps {
-                dir('myApp') { 
-                    sh "docker build -t $DOCKER_IMAGE ."
-                }
-            }
-        }
-
-        stage('Push Docker Image') {
-            steps {
-                dir('myApp') { 
-                    sh "docker push $DOCKER_IMAGE"
+                script {
+                    dir('myApp') {
+                        def image = docker.build(DOCKER_IMAGE)
+                        image.push()
+                    }
                 }
             }
         }
