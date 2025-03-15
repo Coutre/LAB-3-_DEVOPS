@@ -9,38 +9,40 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/Coutre/LAB-3-_DEVOPS'
+                git 'https://github.com/Coutre/LAB-3-_DEVOPS'
             }
         }
 
         stage('Build Maven Project') {
             steps {
-                script {
-                    dir('myApp') { 
-                        sh 'mvn clean package'
-                    }
-                }
+                bat 'mvn clean package'  // Use bat for Windows
+            }
+        }
+
+        stage('Check Docker') {
+            steps {
+                bat 'docker --version'
+                bat 'docker ps'
             }
         }
 
         stage('Docker Login') {
             steps {
-                script {
-                    withDockerRegistry([credentialsId: DOCKER_HUB_CREDENTIALS]) {
-                        echo "Logged into Docker Hub successfully."
-                    }
+                withCredentials([usernamePassword(credentialsId: DOCKER_HUB_CREDENTIALS, usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                    bat "echo %DOCKER_PASS% | docker login -u %DOCKER_USER% --password-stdin"
                 }
             }
         }
 
-        stage('Build & Push Docker Image') {
+        stage('Build Docker Image') {
             steps {
-                script {
-                    dir('myApp') {
-                        def image = docker.build(DOCKER_IMAGE)
-                        image.push()
-                    }
-                }
+                bat "docker build -t %DOCKER_IMAGE% ."
+            }
+        }
+
+        stage('Push Docker Image') {
+            steps {
+                bat "docker push %DOCKER_IMAGE%"
             }
         }
     }
